@@ -1,0 +1,26 @@
+version: '3.5'
+
+services:
+  mariadb:
+    image: mariadb:10.7.3
+    container_name: monitor-db
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_DATABASE: monitor-db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql/monitor-db
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8088:8080"
+    command:
+      - start-dev
+volumes:
+  mysql_data:

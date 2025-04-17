@@ -1,0 +1,30 @@
+server:
+  http2:
+    enabled: true
+  compression:
+    enabled: true
+    min-response-size: 30
+spring:
+  application:
+    name: monitorapi
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3307/monitor-db
+    username: root
+    password: admin
+  flyway:
+    user: root
+    password: admin
+    url: jdbc:mariadb://localhost:3307/monitor-db
+    locations: classpath:db/migration
+    enabled: true
+    baseline-version: 0
+    baseline-on-migrate: true
+  jpa:
+    show-sql: true
+keycloak:
+  auth-server-url: ${value.keycloak.url}
+  realm: ${value.keycloak.realm}
+  resource: ${value.client.id}
+  public-client: true
+  bearer-only: true
