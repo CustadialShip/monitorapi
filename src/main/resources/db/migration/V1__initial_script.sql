@@ -39,4 +39,3 @@ CREATE TABLE IF NOT EXISTS `sensors` (
     CONSTRAINT `fk_sensors_type` FOREIGN KEY (`type`) REFERENCES `types` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_sensors_unit` FOREIGN KEY (`unit`) REFERENCES `units` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 );
-

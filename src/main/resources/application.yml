@@ -10,7 +10,7 @@ spring:
     name: monitorapi
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: ${POSTGRES_DATA_DB_URL:jdbc:mariadb://mariadb:3306/monitor-db}
+    url: ${POSTGRES_DATA_DB_URL:jdbc:mariadb://localhost:3307/monitor-db}
     username: ${POSTGRES_DATA_DB_USER:root}
     password: ${POSTGRES_DATA_DB_PASSWORD:admin}
   flyway:
@@ -27,12 +27,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/monitor-realm}
-          jwk-set-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/monitor-realm}/protocol/openid-connect/certs
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/monitor-realm}
+          jwk-set-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/monitor-realm}/protocol/openid-connect/certs
       client:
         provider:
           keycloak:
-            issuer-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/monitor-realm}
+            issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/realms/monitor-realm}
             user-name-attribute: preferred_username
         registration:
           keycloak:

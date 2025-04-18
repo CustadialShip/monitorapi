@@ -23,17 +23,28 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * REST controller for managing {@link Sensor} entities.
+ * <p>
+ * Provides CRUD operations and filtering capabilities with role-based access control.
+ */
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/sensors")
+@RequiredArgsConstructor
 public class SensorController {
 
     private final SensorRepository sensorRepository;
-
     private final SensorMapper sensorMapper;
-
     private final ObjectMapper objectMapper;
 
+    /**
+     * Creates a new Sensor.
+     * Accessible only to users with the 'ADMINISTRATOR' role.
+     *
+     * @param sensorDto DTO representing the sensor to create
+     * @return the created sensor as a DTO
+     * @throws ResponseStatusException if the provided ID is not null
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public SensorDto create(@RequestBody @Valid SensorDto sensorDto) {
@@ -45,6 +56,15 @@ public class SensorController {
         return sensorMapper.toDto(resultSensor);
     }
 
+    /**
+     * Retrieves a Sensor by its ID.
+     * Accessible to users with 'VIEWER' or 'ADMINISTRATOR' roles.
+     * Response is cached based on sensor ID.
+     *
+     * @param id UUID of the sensor
+     * @return the found sensor as a DTO
+     * @throws ResponseStatusException if not found
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     @Cacheable(value = "sensors", key = "#id")
@@ -57,6 +77,14 @@ public class SensorController {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id '%s' not found".formatted(id))));
     }
 
+    /**
+     * Retrieves a paginated list of Sensors with optional filtering.
+     * Accessible to users with 'VIEWER' or 'ADMINISTRATOR' roles.
+     *
+     * @param sensorFilter filter criteria
+     * @param pageable pagination parameters
+     * @return a paged list of Sensor DTOs
+     */
     @GetMapping
     @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public PagedModel<SensorDto> getAll(@ModelAttribute SensorFilter sensorFilter, Pageable pageable) {
@@ -65,6 +93,16 @@ public class SensorController {
         return new PagedModel<>(unitDtoPage);
     }
 
+    /**
+     * Fully updates a Sensor.
+     * Accessible only to users with the 'ADMINISTRATOR' role.
+     * Invalidates the cache for the updated sensor.
+     *
+     * @param id ID of the sensor to update
+     * @param sensorDto new sensor data
+     * @return the updated sensor as a DTO
+     * @throws ResponseStatusException if sensor not found or ID in DTO is not null
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @CacheEvict(value = "sensors", key = "#id")
@@ -79,6 +117,17 @@ public class SensorController {
         return sensorMapper.toDto(resultSensor);
     }
 
+    /**
+     * Partially updates a Sensor using JSON patch.
+     * Accessible only to users with the 'ADMINISTRATOR' role.
+     * Invalidates the cache for the updated sensor.
+     *
+     * @param id ID of the sensor to patch
+     * @param patchNode JSON node with patch data
+     * @return the updated sensor as a DTO
+     * @throws IOException if patch application fails
+     * @throws ResponseStatusException if sensor not found
+     */
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @CacheEvict(value = "sensors", key = "#id")
@@ -94,6 +143,14 @@ public class SensorController {
         return sensorMapper.toDto(resultSensor);
     }
 
+    /**
+     * Deletes a Sensor by its ID.
+     * Accessible only to users with the 'ADMINISTRATOR' role.
+     * Invalidates the cache for the deleted sensor.
+     *
+     * @param id ID of the sensor to delete
+     * @return the deleted sensor as a DTO or null if not found
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     @CacheEvict(value = "sensors", key = "#id")

@@ -19,10 +19,27 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.stream.Stream;
 
+/**
+ * Configuration class for application security.
+ * <p>
+ * This class sets up the Spring Security configuration for OAuth2 login,
+ * JWT-based resource server authentication, and method-level security.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
+
+    /**
+     * Configures the HTTP security for the application.
+     * <p>
+     * It ensures all requests are authenticated, enables OAuth2 login,
+     * and configures the application as a resource server using JWT.
+     *
+     * @param http the {@link HttpSecurity} to configure
+     * @return the {@link SecurityFilterChain} bean
+     * @throws Exception if any error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -37,6 +54,14 @@ public class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * Custom JWT authentication converter that maps roles from the "spring_sec_roles" claim.
+     * <p>
+     * This allows the application to recognize and use roles stored in the JWT claims
+     * in addition to the default authorities.
+     *
+     * @return the customized {@link JwtAuthenticationConverter} bean
+     */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
@@ -56,6 +81,14 @@ public class SecurityConfiguration {
         return jwtAuthenticationConverter;
     }
 
+    /**
+     * Custom OAuth2 user service that adds roles from the "spring_sec_roles" OIDC claim.
+     * <p>
+     * Enhances the default {@link OidcUserService} by appending extra authorities
+     * based on the roles claim provided in the OIDC token.
+     *
+     * @return the customized {@link OAuth2UserService} for {@link OidcUserRequest} and {@link OidcUser}
+     */
     @Bean
     public OAuth2UserService<OidcUserRequest, OidcUser> oAuth2UserService() {
         var oidcUserService = new OidcUserService();

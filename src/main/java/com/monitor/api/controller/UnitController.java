@@ -16,15 +16,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-@RestController("/api/units")
+/**
+ * REST controller for managing Unit entities.
+ * Provides endpoints for creating, retrieving, updating, and deleting units.
+ */
+@RestController
+@RequestMapping("/api/units")
 @RequiredArgsConstructor
-@RequestMapping
 public class UnitController {
 
     private final UnitRepository unitRepository;
-
     private final UnitMapper unitMapper;
 
+    /**
+     * Creates a new Unit.
+     *
+     * @param unitDto the DTO representation of the Unit to create; must not have an ID
+     * @return the created Unit as a DTO
+     * @throws ResponseStatusException if the ID is not null
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public UnitDto create(@RequestBody @Valid UnitDto unitDto) {
@@ -36,6 +46,13 @@ public class UnitController {
         return unitMapper.toDto(resultUnit);
     }
 
+    /**
+     * Retrieves a Unit by its ID.
+     *
+     * @param id the ID of the Unit to retrieve
+     * @return the Unit as a DTO
+     * @throws ResponseStatusException if the ID is null or the Unit is not found
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public UnitDto getOne(@PathVariable String id) {
@@ -47,6 +64,12 @@ public class UnitController {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id '%s' not found".formatted(id))));
     }
 
+    /**
+     * Retrieves a paginated list of all Units.
+     *
+     * @param pageable the pagination information
+     * @return a PagedModel of UnitDto
+     */
     @GetMapping
     @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public PagedModel<UnitDto> getAll(Pageable pageable) {
@@ -55,6 +78,14 @@ public class UnitController {
         return new PagedModel<>(unitDtoPage);
     }
 
+    /**
+     * Updates an existing Unit by its ID.
+     *
+     * @param id the ID of the Unit to update
+     * @param unitDto the updated Unit data; must not have an ID
+     * @return the updated Unit as a DTO
+     * @throws ResponseStatusException if the Unit is not found or the DTO contains an ID
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public UnitDto update(@PathVariable String id, @RequestBody @Valid UnitDto unitDto) {
@@ -68,6 +99,12 @@ public class UnitController {
         return unitMapper.toDto(resultUnit);
     }
 
+    /**
+     * Deletes a Unit by its ID.
+     *
+     * @param id the ID of the Unit to delete
+     * @return the deleted Unit as a DTO, or null if not found
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public UnitDto delete(@PathVariable String id) {

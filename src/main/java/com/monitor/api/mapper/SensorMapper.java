@@ -6,6 +6,11 @@ import com.monitor.api.entity.Unit;
 import com.monitor.api.entity.dto.SensorDto;
 import org.mapstruct.*;
 
+/**
+ * Mapper interface for converting between {@link Sensor} entities and {@link SensorDto} data transfer objects (DTOs).
+ * It uses the MapStruct framework to generate the mapping implementation.
+ * This interface also handles custom mappings for related entities like {@link Type} and {@link Unit}.
+ */
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface SensorMapper {
 
