@@ -1,4 +1,4 @@
-# 📡 Monitor API
+# Monitor API
 
 A Spring Boot RESTful API service
 

@@ -1,4 +1,5 @@
 server:
+  port: 8088
   http2:
     enabled: true
   compression:
@@ -9,13 +10,13 @@ spring:
     name: monitorapi
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: ${POSTGRES_DATA_DB_URL:jdbc:mariadb://localhost:3307/monitor-db}
+    url: ${POSTGRES_DATA_DB_URL:jdbc:mariadb://mariadb:3306/monitor-db}
     username: ${POSTGRES_DATA_DB_USER:root}
     password: ${POSTGRES_DATA_DB_PASSWORD:admin}
   flyway:
-    user: ${POSTGRES_DATA_DB_USER:root}
-    password: ${POSTGRES_DATA_DB_PASSWORD:admin}
-    url: ${POSTGRES_DATA_DB_URL:jdbc:mariadb://localhost:3307/monitor-db}
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    url: ${spring.datasource.url}
     locations: classpath:db/migration
     enabled: true
     baseline-version: 0
@@ -26,15 +27,20 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8088/realms/monitor-realm}
-          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+          issuer-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/monitor-realm}
+          jwk-set-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/monitor-realm}/protocol/openid-connect/certs
       client:
         provider:
           keycloak:
-            issuer-uri: ${JWT_ISSUER_URI:http://localhost:8088/realms/monitor-realm}
+            issuer-uri: ${JWT_ISSUER_URI:http://keycloak:8080/realms/monitor-realm}
             user-name-attribute: preferred_username
         registration:
           keycloak:
             client-id: ${KEYCLOAK_CLIENT_ID:monitor-client}
-            client-secret: ${KEYCLOAK_CLIENT_SECRET:MvBX45NPMptgSeBG4yF4R6MhLQksroOq}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:W4L0YVZKLyY3aXKocSv4zxHJxvheoekv}
             scope: openid
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
