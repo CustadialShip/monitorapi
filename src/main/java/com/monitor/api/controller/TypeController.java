@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +26,7 @@ public class TypeController {
     private final TypeMapper typeMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public TypeDto create(@RequestBody @Valid TypeDto typeDto) {
         if (typeDto.id() != null) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Id must be null");
@@ -35,6 +37,7 @@ public class TypeController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public TypeDto getOne(@PathVariable String id) {
         if (id == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
@@ -45,6 +48,7 @@ public class TypeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public PagedModel<TypeDto> getAll(Pageable pageable) {
         Page<Type> types = typeRepository.findAll(pageable);
         Page<TypeDto> typeDtoPage = types.map(typeMapper::toDto);
@@ -52,6 +56,7 @@ public class TypeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public TypeDto update(@PathVariable String id, @RequestBody @Valid TypeDto typeDto) {
         if (typeDto.id() != null) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Id must be null");
@@ -64,6 +69,7 @@ public class TypeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public TypeDto delete(@PathVariable String id) {
         Type type = typeRepository.findById(id).orElse(null);
         if (type != null) {

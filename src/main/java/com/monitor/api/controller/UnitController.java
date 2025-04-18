@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,6 +26,7 @@ public class UnitController {
     private final UnitMapper unitMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public UnitDto create(@RequestBody @Valid UnitDto unitDto) {
         if (unitDto.id() != null) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Id must be null");
@@ -35,6 +37,7 @@ public class UnitController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public UnitDto getOne(@PathVariable String id) {
         if (id == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity not found");
@@ -45,6 +48,7 @@ public class UnitController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public PagedModel<UnitDto> getAll(Pageable pageable) {
         Page<Unit> units = unitRepository.findAll(pageable);
         Page<UnitDto> unitDtoPage = units.map(unitMapper::toDto);
@@ -52,6 +56,7 @@ public class UnitController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public UnitDto update(@PathVariable String id, @RequestBody @Valid UnitDto unitDto) {
         if (unitDto.id() != null) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Id must be null");
@@ -64,6 +69,7 @@ public class UnitController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public UnitDto delete(@PathVariable String id) {
         Unit unit = unitRepository.findById(id).orElse(null);
         if (unit != null) {

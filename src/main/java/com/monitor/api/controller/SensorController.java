@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,6 +35,7 @@ public class SensorController {
     private final ObjectMapper objectMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public SensorDto create(@RequestBody @Valid SensorDto sensorDto) {
         if (sensorDto.getId() != null) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Id must be null");
@@ -44,6 +46,7 @@ public class SensorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     @Cacheable(value = "sensors", key = "#id")
     public SensorDto getOne(@PathVariable UUID id) {
         if (id == null) {
@@ -55,6 +58,7 @@ public class SensorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('VIEWER', 'ADMINISTRATOR')")
     public PagedModel<SensorDto> getAll(@ModelAttribute SensorFilter sensorFilter, Pageable pageable) {
         Page<Sensor> units = sensorRepository.findAll(sensorFilter.toSpecification(), pageable);
         Page<SensorDto> unitDtoPage = units.map(sensorMapper::toDto);
@@ -62,6 +66,7 @@ public class SensorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     @CacheEvict(value = "sensors", key = "#id")
     public SensorDto update(@PathVariable UUID id, @RequestBody @Valid SensorDto sensorDto) {
         if (sensorDto.getId() != null) {
@@ -75,6 +80,7 @@ public class SensorController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     @CacheEvict(value = "sensors", key = "#id")
     public SensorDto patch(@PathVariable UUID id, @RequestBody JsonNode patchNode) throws IOException {
         Sensor sensor = sensorRepository.findById(id).orElseThrow(() ->
@@ -89,6 +95,7 @@ public class SensorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     @CacheEvict(value = "sensors", key = "#id")
     public SensorDto delete(@PathVariable UUID id) {
         Sensor sensor = sensorRepository.findById(id).orElse(null);
